@@ -1,4 +1,4 @@
-import zodErrorsParser from '@/zodErrorsParser'
+import { zodErrorsParser } from '@/zodErrorsParser'
 import z from 'zod'
 
 describe('GET', () => {
@@ -12,7 +12,7 @@ describe('GET', () => {
     })
 
     const data = {
-      email: '',
+      email: undefined,
       password: ''
     }
 
