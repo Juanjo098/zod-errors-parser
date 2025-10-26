@@ -1,190 +1,98 @@
-# http-error-middleware
+# zod-errors-parser
 
-`http-error-middleware` is a package that simplifies error handling in Express applications. It provides an easy way to generate and manage specific HTTP errors using middleware, making your code clearer and ensuring a consistent structure for error responses.
+`zod-errors-parser` is a small but powerful utility package designed to simplify and standardize error handling from Zod, a popular schema validation library for TypeScript and JavaScript.
 
-This package allows you to throw errors with specific HTTP status codes and custom messages, then handle them centrally in your application using a single middleware.
+Instead of dealing directly with the complex structure of ZodError.issues, this parser converts validation errors into a clean, easy-to-read object grouped by field.
+It’s perfect for displaying validation messages in forms, APIs, or any context where you need clear and structured feedback for users or developers.
 
 ## Installation
 
 You can install the package from npm using the following command:
 
 ```bash
-npm install http-error-middleware
+npm install zod-errors-parser
 ```
 
-## Basic Usage
-
-### Set Up Middleware in Your Express Application
-
-First, you need to import and use the middleware provided by http-error-middleware in your Express app.
+## Usage example
 
 ```typescript
-import express from 'express'
-// Import the package
-import { httpErrorMiddleware } from 'http-error-middleware'
+import zodErrorsParser from '@/zodErrorsParser'
+import z from 'zod'
 
-const app = express()
+const schema = z.object({
+      email: z
+        .email('Send a valid email')
+        .nonempty('Email require'),
+      password: z.string().nonempty('Password require')
+    })
 
-// Define your app routes.
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'Hello world' })
-})
+const data = {
+  email: '',
+  password: ''
+}
 
-// Use the middleware to handle errors.
-app.use(httpErrorMiddleware())
-// Other middleware for handling errors can go here.
+const parsedData = schema.safeParse(data)
 
-// Start the server.
-app.listen(3000, () => {
-  console.log('Server running')
-})
-```
-
-### httpErrorMiddleware settings
-
-The middleware offers some configurations to customize the error response, which are optional.
-
-```typescript
-import express from 'express'
-
-import { httpErrorMiddleware } from 'http-error-middleware'
-
-const app = express()
-//Other Express app config
-
-app.use(httpErrorMiddleware({
-  destructure: false,
-  statusCodeOnResponse: false
-}))
-```
-
-- If you want the error details to be placed at the root of the response body, set the "destructure" flag to true.
-
-- If you want the status code sent to be in the response body, set the "statusCodeOnResponse" flag to true.
-
-The default settings is as follows:
-
-```json
-{
-  "destructure": false,
-  "statusCodeOnResponse": true
+if (!parsedData.success) {
+  return zodErrorsParser(parsedData.error.issues)
 }
 ```
 
-### Throw Errors Where You Need Them
-
-You can throw HTTP errors anywhere in your application using the HttpError class provided by the package. Here's a simple example to throw a 400 Bad Request error.
+You'll get the next output
 
 ```typescript
-import { HttpError } from 'http-error-middleware'
-
-if (condition) throw HttpError.badRequest('Email and/or password are wrong')
+  {
+    email: ['Send a valid email', 'Email require'],
+    password: ['Password require']
+  }
 ```
 
-This code will throw an error that gets handled by the middleware, and the response will look like this:
-
-```json
-{
-  "message": "Email and/or password are wrong",
-  "statusCode": 400 // This property will be removed this if you set the "statusCodeOnResponse" flag to false.
-}
-```
-
-### Errors with Additional Details
-
-If you need to send more details with the error (e.g., information about which form field is incorrect), you can do it like this:
+If you want retrieve only the first error, set this in te options:
 
 ```typescript
-import { HttpError } from 'http-error-middleware'
+import zodErrorsParser from '@/zodErrorsParser'
+import z from 'zod'
 
-if (condition) HttpError.badRequest('Email and/or password are wrong', { fieldName: "Error message", ...moreErrors })
-```
+const schema = z.object({
+      email: z
+        .email('Send a valid email')
+        .nonempty('Email require'),
+      password: z.string().nonempty('Password require')
+    })
 
-This will generate a response with additional error details:
+const data = {
+  email: '',
+  password: ''
+}
 
-```json
-{
-  "message": "Email and/or password are wrong",
-  "details": {
-    "fieldName": "Error message",
-    "fieldName2": "Error message"
-  },
-  "statusCode": 400 // This property will be removed this if you set the "statusCodeOnResponse" flag to false.
+const parsedData = schema.safeParse(data)
+
+if (!parsedData.success) {
+  return zodErrorsParser(parsedData.error.issues, { onlyFirstError: true })
 }
 ```
 
-If you have the "destructure" flag set, the message will be displayed like this:
+Then you'll get the next output
 
-```json
-{
-  "message": "Email and/or password are wrong",
-  "fieldName": "Error message",
-  "fieldName2": "Error message",
-  "statusCode": 400 // This property will be removed this if you set the "statusCodeOnResponse" flag to false.
-}
+```typescript
+  {
+    email: ['Send a valid email'],
+    password: ['Password require']
+  }
 ```
-
-## Available HTTP Error Methods
-
-The package provides methods to generate common HTTP errors with specific status codes. Here are the available methods:
-
-### Client Errors (4xx)
-
-- `HttpError.badRequest(message: string, details?: object)`
-  - Throws a `400 Bad Request` error with the provided message and optional details.
-  
-- `HttpError.unauthorized(message: string, details?: object)`
-  - Throws a `401 Unauthorized` error with the provided message and optional details.
-  
-- `HttpError.paymentRequired(message: string, details?: object)`
-  - Throws a `402 Payment Required` error with the provided message and optional details.
-  
-- `HttpError.forbidden(message: string, details?: object)`
-  - Throws a `403 Forbidden` error with the provided message and optional details.
-  
-- `HttpError.notFound(message: string, details?: object)`
-  - Throws a `404 Not Found` error with the provided message and optional details.
-  
-- `HttpError.methodNotAllowed(message: string, details?: object)`
-  - Throws a `405 Method Not Allowed` error with the provided message and optional details.
-  
-- `HttpError.notAcceptable(message: string, details?: object)`
-  - Throws a `406 Not Acceptable` error with the provided message and optional details.
-  
-- `HttpError.proxyAuthenticationRequired(message: string, details?: object)`
-  - Throws a `407 Proxy Authentication Required` error with the provided message and optional details.
-  
-- `HttpError.requestTimeOut(message: string, details?: object)`
-  - Throws a `408 Request Timeout` error with the provided message and optional details.
-  
-- `HttpError.conflict(message: string, details?: object)`
-  - Throws a `409 Conflict` error with the provided message and optional details.
-
-### Server Errors (5xx)
-
-- `HttpError.internalServerError(message: string, details?: object)`
-  - Throws a `500 Internal Server Error` with the provided message and optional details.
-  
-- `HttpError.notImplemented(message: string, details?: object)`
-  - Throws a `501 Not Implemented` error with the provided message and optional details.
-  
-- `HttpError.badGateway(message: string, details?: object)`
-  - Throws a `502 Bad Gateway` error with the provided message and optional details.
-  
-- `HttpError.serviceUnavailable(message: string, details?: object)`
-  - Throws a `503 Service Unavailable` error with the provided message and optional details.
-  
-- `HttpError.gatewayTimeOut(message: string, details?: object)`
-  - Throws a `504 Gateway Timeout` error with the provided message and optional details.
-
-### Custom Error
-
-- `HttpError.custom(message: string, statusCode: number, details?: object)`
-  - Throws a custom error with a specified `statusCode` (for errors not covered by the predefined methods) and optional details.
-
-Each of these methods generates a response with an appropriate HTTP status code, a message, and optionally, additional details.
 
 ## Benefits
-Consistency: Centralize error handling in a single middleware.
-Clarity: Easily create and throw HTTP errors with clear and specific messages.
-Extensibility: Add additional details to errors to provide more context, such as information about specific fields.
+✅ Simplicity:
+Easily converts Zod’s complex error structure into a clean, readable, and developer-friendly format.
+
+✅ Consistency:
+Centralize and standardize how validation errors are handled and displayed across your entire application.
+
+✅ Clarity:
+Provides clear, per-field error messages — ideal for form validation or API responses.
+
+✅ Extensibility:
+Flexible configuration options (like onlyFirstError) let you tailor the output to your specific use case.
+
+✅ TypeScript Friendly:
+Built with full TypeScript support for strong typing and autocompletion during development.
