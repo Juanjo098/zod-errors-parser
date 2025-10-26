@@ -1,6 +1,6 @@
 {
   "name": "zod-errors-parser",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Util to simply zod errors for an API response.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -16,8 +16,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "license": "MIT",
   "devDependencies": {
     "@stylistic/eslint-plugin-js": "4.4.1",
     "@types/jest": "30.0.0",
