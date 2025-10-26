@@ -4,7 +4,7 @@ interface Options {
   onlyFirstError: boolean
 }
 
-export default function zodErrorsParser(errors: ZodIssue[], options: Partial<Options>  = { onlyFirstError: false }) {
+export function zodErrorsParser(errors: ZodIssue[], options: Partial<Options>  = { onlyFirstError: false }) {
   const parsedErrors: { [key: PropertyKey]: string[] } = { }
 
   const { onlyFirstError } = options
