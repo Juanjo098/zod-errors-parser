@@ -1,0 +1,9 @@
+/node_modules
+/src
+/.github
+
+tsconfig.json
+tsup.config.ts
+eslint.config.mjs
+jest.config.js
+README.md

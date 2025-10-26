@@ -1,0 +1,29 @@
+{
+  "name": "zod-errors-parser",
+  "version": "1.0.0",
+  "description": "Util to simply zod errors for an API response.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "eslint": "eslint",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@stylistic/eslint-plugin-js": "4.4.1",
+    "@types/jest": "30.0.0",
+    "eslint": "9.38.0",
+    "jest": "30.2.0",
+    "ts-jest": "29.4.5",
+    "ts-node": "10.9.2",
+    "tsup": "8.5.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.2",
+    "zod": "4.1.12"
+  }
+}
