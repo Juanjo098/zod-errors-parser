@@ -81,6 +81,41 @@ Then you'll get the next output
   }
 ```
 
+## Array Parser
+
+```typescript
+import { zodArrayErrorParser } from '@/zodErrorsParser'
+import z from 'zod'
+
+const userSchema = z.object({
+  name: z.string('Send plain text')
+    .min(6, '6 character required'),
+  email: z.email('Send a validad email')
+})
+
+const userArray = userSchema.array()
+
+const users = [
+  { name: 'abc', email: 'examplemail.com' },
+  { name: 'def', email: 'examplemail.com' }
+]
+
+const parsedData = userArray.safeParse(users)
+
+if (!parsedData.success) {
+  return zodArrayErrorParser(parsedData.error.issues)
+}
+```
+
+Expected output:
+
+```typescript
+{
+  '0': { name: ['6 character required'], email: ['Send a validad email'] }
+  '1': { name: ['6 character required'], email: ['Send a validad email'] }
+}
+```
+
 ## Benefits
 ✅ Simplicity:
 Easily converts Zod’s complex error structure into a clean, readable, and developer-friendly format.
