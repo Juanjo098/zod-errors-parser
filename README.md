@@ -16,7 +16,7 @@ npm install zod-errors-parser
 ## Usage example
 
 ```typescript
-import { zodErrorsParser } from '@/zodErrorsParser'
+import { zodErrorsParser } from 'zodErrorsParser'
 import z from 'zod'
 
 const schema = z.object({
@@ -50,7 +50,7 @@ You'll get the next output
 If you want retrieve only the first error, set this in te options:
 
 ```typescript
-import { zodErrorsParser } from '@/zodErrorsParser'
+import { zodErrorsParser } from 'zodErrorsParser'
 import z from 'zod'
 
 const schema = z.object({
@@ -84,7 +84,7 @@ Then you'll get the next output
 ## Array Parser
 
 ```typescript
-import { zodArrayErrorParser } from '@/zodErrorsParser'
+import { zodArrayErrorParser } from 'zodErrorsParser'
 import z from 'zod'
 
 const userSchema = z.object({
